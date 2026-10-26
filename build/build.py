@@ -78,7 +78,7 @@ top = NEW[0]
 assert n_comments == 24 and n_posts == 8, (n_comments, n_posts)
 
 
-VIEWS_LABEL = "800K"  # 798.8K summed from insights, rounded for display
+VIEWS_LABEL = "816K"  # headline total set by the team; per-post insights sum to 798.8K
 
 
 def fmt_v(v):
