@@ -120,7 +120,7 @@ hero = f'''
       <div><b>{n_posts}</b><span>Posts live</span><em>{len(set(THEME_OF[p["id"]] for p in NEW))} themes</em></div>
     </div>
   </div>
-  <p class="prepared">1 Oct to 25 Oct 2026 &nbsp;·&nbsp; Google &nbsp;·&nbsp; United States &nbsp;·&nbsp; Rankings captured 25 Oct 2026</p>
+  <p class="prepared">25 Sep to 25 Oct 2026 &nbsp;·&nbsp; Google &nbsp;·&nbsp; United States &nbsp;·&nbsp; Rankings captured 25 Oct 2026</p>
 </div></header>
 <nav class="topnav"><div class="topnav-in"><a href="#glance">At a glance</a><a href="#own">Keywords we own</a><a href="#posts">Posts and rankings</a><a href="#legacy">Still ranking</a><a href="#comments">Branded comments</a><a href="#method">Method</a></div></nav>
 '''
@@ -170,7 +170,7 @@ for s, (np_, nc) in sorted(subs.items(), key=lambda kv: (-(kv[1][0] + kv[1][1]),
 
 glance = f'''
 <div class="wrap" id="glance">
-  <section class="block"><div class="block-head"><h2>At a glance</h2><p>Mack Weldon, 1 Oct to 25 Oct 2026. Most important first: how many people saw the threads, where they placed, and where they now rank on Google.</p></div>
+  <section class="block"><div class="block-head"><h2>At a glance</h2><p>Mack Weldon, 25 Sep to 25 Oct 2026. Most important first: how many people saw the threads, where they placed, and where they now rank on Google.</p></div>
 
     <div class="chartcard">
       <div class="chart-head"><div><div class="eyebrow">Reach on Reddit</div><div class="chart-title">{VIEWS_LABEL} views across {n_posts} threads</div></div>
@@ -386,7 +386,7 @@ ahead = f'''
 <footer id="method"><div class="m81card"><div class="m81-watermark">M81 MEDIA</div><div class="m81card-inner">
   <div class="m81-lock"><img src="m81-logo.png" alt="M81"><span class="bname">M81</span></div>
   <div class="m81-method"><p class="fineprint"><strong>Method.</strong> Each ranking was captured from a live google.com results page on 25 Oct 2026. The dark panel on the right of every screenshot is the raw data for that search. A keyword counts as ranking when our own thread appears on the first page, and it is counted once for each of our threads that appears ({n_rank} rankings, {n_unique} distinct searches). Every screenshot was checked by hand: captures where the highlighted result was a different or older thread, or where our thread only appeared as a sub-link under someone else's result, were removed. Views, subreddit rank and audience come from each thread's Reddit Post Insights at the time of capture. Rankings shift by location, device and date, so each capture is a snapshot from the day it was run.</p>
-  <div class="src"><span>Search engine: Google</span><span>Location: United States</span><span>Device: Desktop</span><span>Captured: 25 Oct 2026</span><span>Period: 1 Oct to 25 Oct 2026</span></div></div>
+  <div class="src"><span>Search engine: Google</span><span>Location: United States</span><span>Device: Desktop</span><span>Captured: 25 Oct 2026</span><span>Period: 25 Sep to 25 Oct 2026</span></div></div>
 </div></div></footer>
 '''
 
