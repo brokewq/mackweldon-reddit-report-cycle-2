@@ -78,6 +78,9 @@ top = NEW[0]
 assert n_comments == 24 and n_posts == 8, (n_comments, n_posts)
 
 
+VIEWS_LABEL = "800K"  # 798.8K summed from insights, rounded for display
+
+
 def fmt_v(v):
     return f"{v / 1e6:.2f}M" if v >= 1e6 else f"{round(v / 1000):,}K"
 
@@ -105,7 +108,7 @@ hero = f'''
   <div class="reach">
     <div class="reach-main">
       <div class="eyebrow">Total views on our threads</div>
-      <div class="reach-n">{fmt_v(views)}</div>
+      <div class="reach-n">{VIEWS_LABEL}</div>
       <div class="reach-sub">across {n_posts} new posts this cycle &nbsp;·&nbsp; <b>{us_share:.0%}</b> from the United States</div>
       <div class="reach-strip">{seg}</div>
       <div class="reach-leg">Views by post. One thread, <b>“{e(short(top["id"]))}”</b>, reached {top["vlabel"]} on its own.</div>
@@ -119,7 +122,7 @@ hero = f'''
   </div>
   <p class="prepared">1 Oct to 25 Oct 2026 &nbsp;·&nbsp; Google &nbsp;·&nbsp; United States &nbsp;·&nbsp; Rankings captured 25 Oct 2026</p>
 </div></header>
-<nav class="topnav"><div class="topnav-in"><a href="#glance">At a glance</a><a href="#own">Keywords we own</a><a href="#posts">Posts and rankings</a><a href="#comments">Branded comments</a><a href="#method">Method</a></div></nav>
+<nav class="topnav"><div class="topnav-in"><a href="#glance">At a glance</a><a href="#own">Keywords we own</a><a href="#posts">Posts and rankings</a><a href="#legacy">Still ranking</a><a href="#comments">Branded comments</a><a href="#method">Method</a></div></nav>
 '''
 
 # ---------- at a glance ----------
@@ -170,7 +173,7 @@ glance = f'''
   <section class="block"><div class="block-head"><h2>At a glance</h2><p>Mack Weldon, 1 Oct to 25 Oct 2026. Most important first: how many people saw the threads, where they placed, and where they now rank on Google.</p></div>
 
     <div class="chartcard">
-      <div class="chart-head"><div><div class="eyebrow">Reach on Reddit</div><div class="chart-title">{fmt_v(views)} views across {n_posts} threads</div></div>
+      <div class="chart-head"><div><div class="eyebrow">Reach on Reddit</div><div class="chart-title">{VIEWS_LABEL} views across {n_posts} threads</div></div>
         <div class="legend">{"".join(f'<span><i class="dot" style="background:{THEMES[k][1]}"></i>{THEMES[k][0]}</span>' for k in dict.fromkeys(THEME_OF[p["id"]] for p in NEW))}</div></div>
       <div class="vbs">{reach_rows}</div>
       <p class="cardnote">Views as shown in each thread's Reddit Post Insights at the time of capture. Click a row to jump to the post.</p>
@@ -308,25 +311,45 @@ for p in NEW:
 old_cards = ""
 for p in OLD:
     name, col = THEMES[THEME_OF[p["id"]]]
-    n = len(kw_by[p["id"]])
+    ks = kw_by[p["id"]]
+    sc = Counter(k[4] for k in ks)
+    n1 = sum(1 for k in ks if k[5] == 1)
+    chips = (f'<span class="plchip one"><b>{n1}</b>at #1 in its section</span>' if n1 else "") + "".join(
+        f'<span class="plchip s{s}"><b>{sc[s]}</b>{SURF_NAME[s]}</span>' for s in ("C", "D", "O") if sc[s])
+    rows = "".join(
+        f'<a class="kw-row2" href="{shot}" data-kw="{e(k)}" data-pl="{SURF_NAME[s]}{" · #1" if pos == 1 else ""}">'
+        f'<span class="lg-i">{j:02d}</span><span class="kw-t">{e(k)}{"<b class=p1>#1</b>" if pos == 1 else ""}</span>'
+        f'<span class="kw-v">View screenshot {AR}</span></a>'
+        for j, (t, k, shot, thumb, s, pos) in enumerate(ks, 1))
     old_cards += f'''
-<article class="card post noins" id="{p["id"]}" style="--tc:{col}">
-  <div class="ph"><div class="ph-b">
-    <div class="card-meta"><span class="pnum">Cycle 01</span><span class="sub">{p["sub"]}</span><span class="pill">{name}</span></div>
+<article class="card post" id="{p["id"]}" style="--tc:{col}">
+  <div class="oh"><div>
+    <div class="card-meta"><span class="sub">{p["sub"]}</span><span class="sep">·</span><span>{name}</span><span class="pill prev">Posted in Cycle 01</span></div>
     <h3 class="ptitle"><a href="{p["url"]}" target="_blank" rel="noopener">{e(p["title"])} {AR}</a></h3>
-    <div class="pstats"><div class="pstat"><b>{n}</b><span>Keywords ranking this cycle</span></div></div>
-  </div></div>
-  {ledger(p["id"])}
+    <div class="plrow">{chips}</div>
+  </div><div class="oh-n"><b>{len(ks)}</b><span>keywords<br>ranking</span></div></div>
+  <div class="kwgrid">{rows}</div>
 </article>'''
+
+legacy = f'''
+<section class="legacy" id="legacy"><div class="wrap">
+  <div class="legacy-head"><div>
+    <div class="eyebrow">From Cycle 01, still compounding</div>
+    <h3>Still ranking from last cycle</h3>
+    <p>Threads we published in Cycle 01 that hold first-page positions on Google today, checked on the same day as everything above. Their {n_old} rankings are part of this cycle's {n_rank}.</p>
+  </div><div class="legacy-stats"><div><b>{len(OLD)}</b><span>Threads</span></div><div><b>{n_old}</b><span>Keywords ranking</span></div></div></div>
+  {old_cards}
+</div></section>
+'''
 
 posts_html = f'''
 <section class="brand" id="posts">
   <div class="band"><div class="band-in">
-    <div class="band-top"><div><div class="eyebrow">Posts and rankings</div><h2>Eight threads,<br>{fmt_v(views)} views</h2></div>
+    <div class="band-top"><div><div class="eyebrow">Posts and rankings</div><h2>Eight threads,<br>{VIEWS_LABEL} views</h2></div>
       <div class="band-procs"><div class="eyebrow">Themes targeted</div><div>{"".join(f'<span class="proc">{THEMES[k][0]}</span>' for k in dict.fromkeys(THEME_OF[p["id"]] for p in NEW))}</div></div></div>
     <div class="band-stats">
       <div><b>{n_posts}</b><span>Posts live</span></div>
-      <div><b>{fmt_v(views)}</b><span>Views</span></div>
+      <div><b>{VIEWS_LABEL}</b><span>Views</span></div>
       <div><b>{n_rank}</b><span>Google rankings</span></div>
       <div><b>{n_first}</b><span>#1 spots on Google</span></div>
     </div>
@@ -335,8 +358,6 @@ posts_html = f'''
     <div class="block"><div class="block-head"><h3>Keyword coverage by post</h3><p>Each keyword below was searched on Google and captured with our thread on the first page.</p></div>
     <div class="cov"><div class="cov-head"><span>Post</span><span>Keywords ranking</span></div>{cov}</div></div>
     {cards}
-    <div class="block oldhead"><div class="block-head"><h3>Cycle 01 threads, still ranking</h3><p>Threads from last cycle that picked up {n_old} new page-one rankings this month. They are included in the {n_rank} total.</p></div></div>
-    {old_cards}
   </div>
 </section>
 '''
@@ -377,9 +398,9 @@ css = (ROOT / "build" / "style.css").read_text()
 html = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Mack Weldon: Reddit Report, Cycle 02 | M81</title>
-<meta name="description" content="Mack Weldon on Reddit, Cycle 02: {fmt_v(views)} views, {n_rank} Google rankings, {n_posts} posts and {n_comments} branded comments.">
+<meta name="description" content="Mack Weldon on Reddit, Cycle 02: {VIEWS_LABEL} views, {n_rank} Google rankings, {n_posts} posts and {n_comments} branded comments.">
 <link rel="icon" href="m81-logo.png">
 <style>{css}</style></head><body>
-{hero}{glance}{own}{posts_html}{comments}{ahead}{lightbox}</body></html>'''
+{hero}{glance}{own}{posts_html}{legacy}{comments}{ahead}{lightbox}</body></html>'''
 (ROOT / "index.html").write_text(html)
 print(f"views {views:,}  us {us_share:.1%}  rankings {n_rank} (old {n_old})  unique {n_unique}  #1 {n_first}  surf {dict(surf)}  themes {dict(theme_n)}  subs {n_subs}")
